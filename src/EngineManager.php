@@ -16,4 +16,9 @@ class EngineManager extends ScoutEngineManager{
         );
     }
 
+    protected function ensureAlgoliaClientIsInstalled()
+    {
+        return;
+    }
+
 }

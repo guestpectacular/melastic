@@ -107,19 +107,21 @@ class Builder extends ScoutBuilder
         '=', '!=', '>', '>=', '<', '<=', 'TO', 'EXISTS', 'IN', 'NOT', 'AND', 'OR',
     ];
 
+    public array $attributesToSearchOn;
+
     /**
      * Create a new search builder instance.
      *
-     * @param  Model  $model
-     * @param  string  $query
-     * @param  Closure|null  $callback
-     * @param  bool  $softDelete
+     * @param Model $model
+     * @param string $query
+     * @param Closure|null $callback
+     * @param bool $softDelete
      * @return void
      */
     public function __construct($model, $query, $callback = null, $softDelete = false)
     {
-        $this->model    = $model;
-        $this->query    = $query;
+        $this->model = $model;
+        $this->query = $query;
         $this->callback = $callback;
 
         if ($softDelete) {
@@ -127,13 +129,34 @@ class Builder extends ScoutBuilder
         }
     }
 
+    public function limit(int $limit): self
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * @param string|array $attributes
+     * @return $this
+     */
+    public function attributesToSearchOn(string|array $attributes = []): self
+    {
+        if (!is_array($attributes)) {
+            $attributes = [$attributes];
+        }
+        $this->attributesToSearchOn = $attributes;
+
+        return $this;
+    }
+
     /**
      * Specify a custom index to perform this search on.
      *
-     * @param  string  $index
+     * @param string $index
      * @return $this
      */
-    public function within($index)
+    public function within($index): self
     {
         $this->index = $index;
 
@@ -143,13 +166,13 @@ class Builder extends ScoutBuilder
     /**
      * Add a full sub-select to the query.
      *
-     * @param  Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @param  string  $boolean
+     * @param Closure|string|array $column
+     * @param mixed $operator
+     * @param mixed $value
+     * @param string $boolean
      * @return $this
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
+    public function where($column, $operator = null, $value = null, $boolean = 'and'): self
     {
 
         // This is the version rewritten to handle all filters on a more native Laravel's way
@@ -204,10 +227,10 @@ class Builder extends ScoutBuilder
     /**
      * Add a "where in" clause to the query.
      *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @param  string  $boolean
-     * @param  bool  $not
+     * @param string $column
+     * @param mixed $values
+     * @param string $boolean
+     * @param bool $not
      * @return $this
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
@@ -236,8 +259,8 @@ class Builder extends ScoutBuilder
     /**
      * Add an "or where in" clause to the query.
      *
-     * @param  Expression|string  $column
-     * @param  mixed  $values
+     * @param Expression|string $column
+     * @param mixed $values
      * @return $this
      */
     public function orWhereIn($column, $values)
@@ -248,9 +271,9 @@ class Builder extends ScoutBuilder
     /**
      * Add a "where not in" clause to the query.
      *
-     * @param  string  $column
-     * @param  mixed  $values
-     * @param  string  $boolean
+     * @param string $column
+     * @param mixed $values
+     * @param string $boolean
      * @return $this
      */
     public function whereNotIn($column, $values, $boolean = 'and')
@@ -261,8 +284,8 @@ class Builder extends ScoutBuilder
     /**
      * Add an "or where in" clause to the query.
      *
-     * @param  Expression|string  $column
-     * @param  mixed  $values
+     * @param Expression|string $column
+     * @param mixed $values
      * @return $this
      */
     public function orWhereNotIn($column, $values)
@@ -273,9 +296,9 @@ class Builder extends ScoutBuilder
     /**
      * Add an exists clause to the query.
      *
-     * @param  string  $column
-     * @param  string  $boolean
-     * @param  bool  $not
+     * @param string $column
+     * @param string $boolean
+     * @param bool $not
      * @return $this
      */
     public function addWhereExists($column, $boolean = 'and', $not = false)
@@ -290,8 +313,8 @@ class Builder extends ScoutBuilder
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  string  $column
-     * @param  string  $boolean
+     * @param string $column
+     * @param string $boolean
      * @return $this
      */
     public function whereExists($column, $boolean = 'and')
@@ -302,7 +325,7 @@ class Builder extends ScoutBuilder
     /**
      * Add an or exists clause to the query.
      *
-     * @param  string  $column
+     * @param string $column
      * @return $this
      */
     public function orWhereExists($column)
@@ -313,7 +336,7 @@ class Builder extends ScoutBuilder
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  string  $column
+     * @param string $column
      * @return $this
      */
     public function whereNotExists($column, $boolean = 'and')
@@ -324,7 +347,7 @@ class Builder extends ScoutBuilder
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  string  $column
+     * @param string $column
      * @return $this
      */
     public function orWhereNotExists($column)
@@ -335,10 +358,10 @@ class Builder extends ScoutBuilder
     /**
      * Add a where between statement to the query.
      *
-     * @param  string  $column
-     * @param  array<int, mixed>  $values
-     * @param  string  $boolean
-     * @param  bool  $not
+     * @param string $column
+     * @param array<int, mixed> $values
+     * @param string $boolean
+     * @param bool $not
      * @return $this
      */
     public function whereBetween($column, $values, $boolean = 'and', $not = false)
@@ -368,9 +391,9 @@ class Builder extends ScoutBuilder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param Closure|string|array $column
+     * @param mixed $operator
+     * @param mixed $value
      * @return $this
      */
     public function orWhere($column, $operator = null, $value = null)
@@ -385,9 +408,9 @@ class Builder extends ScoutBuilder
     /**
      * Add a "filter null" clause to the query.
      *
-     * @param  string  $columns
-     * @param  string  $boolean
-     * @param  bool  $not
+     * @param string $columns
+     * @param string $boolean
+     * @param bool $not
      * @return $this
      */
     public function whereNull($columns, $boolean = 'and', $not = false)
@@ -404,7 +427,7 @@ class Builder extends ScoutBuilder
     /**
      * Add an "or where null" clause to the query.
      *
-     * @param  string|array  $column
+     * @param string|array $column
      * @return $this
      */
     public function orWhereNull($column)
@@ -415,8 +438,8 @@ class Builder extends ScoutBuilder
     /**
      * Add a "where not null" clause to the query.
      *
-     * @param  string|array  $columns
-     * @param  string  $boolean
+     * @param string|array $columns
+     * @param string $boolean
      * @return $this
      */
     public function whereNotNull($columns, $boolean = 'and')
@@ -427,7 +450,7 @@ class Builder extends ScoutBuilder
     /**
      * Add a "where not in" clause to the query.
      *
-     * @param  string  $column
+     * @param string $column
      * @return $this
      */
     public function addWhereIsEmpty($column, $boolean = 'and', $not = false)
@@ -442,9 +465,9 @@ class Builder extends ScoutBuilder
     /**
      * Add a "where IS EMPTY" clause to the query.
      *
-     * @param  string  $column
-     * @param  string  $boolean
-     * @param  bool  $not
+     * @param string $column
+     * @param string $boolean
+     * @param bool $not
      * @return $this
      */
     public function whereIsEmpty($column, $boolean = 'and', $not = false)
@@ -455,7 +478,7 @@ class Builder extends ScoutBuilder
     /**
      * Add an or IS EMPTY clause to the query.
      *
-     * @param  string  $column
+     * @param string $column
      * @return $this
      */
     public function orWhereIsEmpty($column)
@@ -466,8 +489,8 @@ class Builder extends ScoutBuilder
     /**
      * Add an or IS NOT EMPTY clause to the query.
      *
-     * @param  string  $column
-     * @param  string  $boolean
+     * @param string $column
+     * @param string $boolean
      * @return $this
      */
     public function whereIsNotEmpty($column, $boolean = 'and')
@@ -488,7 +511,7 @@ class Builder extends ScoutBuilder
     /**
      * Add a nested filter statement to the query.
      *
-     * @param  string  $boolean
+     * @param string $boolean
      * @return $this
      */
     public function whereNested(Closure $callback, $boolean = 'and')
@@ -501,7 +524,7 @@ class Builder extends ScoutBuilder
     /**
      * Determine if the given operator is supported.
      *
-     * @param  string  $operator
+     * @param string $operator
      * @return bool
      */
     protected function invalidOperator($operator)
@@ -512,9 +535,9 @@ class Builder extends ScoutBuilder
     /**
      * Add an array of where clauses to the query.
      *
-     * @param  array  $column
-     * @param  string  $boolean
-     * @param  string  $method
+     * @param array $column
+     * @param string $boolean
+     * @param string $method
      * @return $this
      */
     protected function addArrayOfWheres($column, $boolean, $method = 'where')
@@ -537,8 +560,8 @@ class Builder extends ScoutBuilder
      *
      * Prevents using Null values with invalid operators.
      *
-     * @param  string  $operator
-     * @param  mixed  $value
+     * @param string $operator
+     * @param mixed $value
      * @return bool
      */
     protected function invalidOperatorAndValue($operator, $value)
@@ -549,9 +572,9 @@ class Builder extends ScoutBuilder
     /**
      * Prepare the value and operator for a filter clause.
      *
-     * @param  string  $value
-     * @param  string  $operator
-     * @param  bool  $useDefault
+     * @param string $value
+     * @param string $operator
+     * @param bool $useDefault
      * @return array
      *
      * @throws InvalidArgumentException
@@ -570,8 +593,8 @@ class Builder extends ScoutBuilder
     /**
      * Add another query builder as a nested where to the query builder.
      *
-     * @param  Builder  $query
-     * @param  string  $boolean
+     * @param Builder $query
+     * @param string $boolean
      * @return $this
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
@@ -631,7 +654,7 @@ class Builder extends ScoutBuilder
     /**
      * Set the "limit" for the search query.
      *
-     * @param  int  $limit
+     * @param int $limit
      * @return $this
      */
     public function take($limit)
@@ -644,14 +667,14 @@ class Builder extends ScoutBuilder
     /**
      * Add an "order" for the search query.
      *
-     * @param  string  $column
-     * @param  string  $direction
+     * @param string $column
+     * @param string $direction
      * @return $this
      */
     public function orderBy($column, $direction = 'asc')
     {
         $this->orders[] = [
-            'column'    => $column,
+            'column' => $column,
             'direction' => strtolower($direction) == 'asc' ? 'asc' : 'desc',
         ];
 
@@ -673,7 +696,7 @@ class Builder extends ScoutBuilder
     /**
      * Set the callback that should have an opportunity to modify the database query.
      *
-     * @param  callable  $callback
+     * @param callable $callback
      * @return $this
      */
     public function query($callback)
@@ -716,7 +739,7 @@ class Builder extends ScoutBuilder
     /**
      * Get the results of the search.
      *
-     * @return Collection
+     * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
      */
     public function get()
     {
@@ -733,7 +756,8 @@ class Builder extends ScoutBuilder
      *
      * @return string
      */
-    public function toRawFilters(): string {
+    public function toRawFilters(): string
+    {
         return $this->engine()->filters($this);
     }
 
@@ -750,9 +774,9 @@ class Builder extends ScoutBuilder
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int  $perPage
-     * @param  string  $pageName
-     * @param  int|null  $page
+     * @param int $perPage
+     * @param string $pageName
+     * @param int|null $page
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
     public function simplePaginate($perPage = null, $pageName = 'page', $page = null)
@@ -766,20 +790,20 @@ class Builder extends ScoutBuilder
                 $this->query);
         }
 
-        $page = $page ? : Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $perPage = $perPage ? : $this->model->getPerPage();
+        $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = $this->model->newCollection($engine->map(
             $this, $rawResults = $engine->paginate($this, $perPage, $page), $this->model
         )->all());
 
         $paginator = Container::getInstance()->makeWith(Paginator::class, [
-            'items'       => $results,
-            'perPage'     => $perPage,
+            'items' => $results,
+            'perPage' => $perPage,
             'currentPage' => $page,
-            'options'     => [
-                'path'     => Paginator::resolveCurrentPath(),
+            'options' => [
+                'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
         ])->hasMorePagesWhen(($perPage * $page) < $engine->getTotalCount($rawResults));
@@ -790,9 +814,9 @@ class Builder extends ScoutBuilder
     /**
      * Paginate the given query into a simple paginator with raw data.
      *
-     * @param  int  $perPage
-     * @param  string  $pageName
-     * @param  int|null  $page
+     * @param int $perPage
+     * @param string $pageName
+     * @param int|null $page
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
     public function simplePaginateRaw($perPage = null, $pageName = 'page', $page = null)
@@ -806,18 +830,18 @@ class Builder extends ScoutBuilder
                 $this->query);
         }
 
-        $page = $page ? : Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $perPage = $perPage ? : $this->model->getPerPage();
+        $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = $engine->paginate($this, $perPage, $page);
 
         $paginator = Container::getInstance()->makeWith(Paginator::class, [
-            'items'       => $results,
-            'perPage'     => $perPage,
+            'items' => $results,
+            'perPage' => $perPage,
             'currentPage' => $page,
-            'options'     => [
-                'path'     => Paginator::resolveCurrentPath(),
+            'options' => [
+                'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
         ])->hasMorePagesWhen(($perPage * $page) < $engine->getTotalCount($results));
@@ -828,9 +852,9 @@ class Builder extends ScoutBuilder
     /**
      * Paginate the given query into a paginator.
      *
-     * @param  int  $perPage
-     * @param  string  $pageName
-     * @param  int|null  $page
+     * @param int $perPage
+     * @param string $pageName
+     * @param int|null $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = null, $pageName = 'page', $page = null)
@@ -843,21 +867,21 @@ class Builder extends ScoutBuilder
             return $engine->paginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query', $this->query);
         }
 
-        $page = $page ? : Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $perPage = $perPage ? : $this->model->getPerPage();
+        $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = $this->model->newCollection($engine->map(
             $this, $rawResults = $engine->paginate($this, $perPage, $page), $this->model
         )->all());
 
         return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
-            'items'       => $results,
-            'total'       => $this->getTotalCount($rawResults),
-            'perPage'     => $perPage,
+            'items' => $results,
+            'total' => $this->getTotalCount($rawResults),
+            'perPage' => $perPage,
             'currentPage' => $page,
-            'options'     => [
-                'path'     => Paginator::resolveCurrentPath(),
+            'options' => [
+                'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
         ])->appends('query', $this->query);
@@ -866,9 +890,9 @@ class Builder extends ScoutBuilder
     /**
      * Paginate the given query into a paginator with raw data.
      *
-     * @param  int  $perPage
-     * @param  string  $pageName
-     * @param  int|null  $page
+     * @param int $perPage
+     * @param string $pageName
+     * @param int|null $page
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function paginateRaw($perPage = null, $pageName = 'page', $page = null)
@@ -881,19 +905,19 @@ class Builder extends ScoutBuilder
             return $engine->paginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query', $this->query);
         }
 
-        $page = $page ? : Paginator::resolveCurrentPage($pageName);
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $perPage = $perPage ? : $this->model->getPerPage();
+        $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = $engine->paginate($this, $perPage, $page);
 
         return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
-            'items'       => $results,
-            'total'       => $this->getTotalCount($results),
-            'perPage'     => $perPage,
+            'items' => $results,
+            'total' => $this->getTotalCount($results),
+            'perPage' => $perPage,
             'currentPage' => $page,
-            'options'     => [
-                'path'     => Paginator::resolveCurrentPath(),
+            'options' => [
+                'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
         ])->appends('query', $this->query);
@@ -902,7 +926,7 @@ class Builder extends ScoutBuilder
     /**
      * Get the total number of results from the Scout engine, or fallback to query builder.
      *
-     * @param  mixed  $results
+     * @param mixed $results
      * @return int
      */
     protected function getTotalCount($results)

@@ -19,11 +19,11 @@ trait Searchable {
      *
      * @param  string  $query
      * @param  \Closure  $callback
-     * @return \Laravel\Scout\Builder<static>
+     * @return Builder<static>
      */
     public static function search($query = '', $callback = null)
     {
-        return app(static::$scoutBuilder ?? \Guestpectacular\Melastic\Builder::class, [
+        return app(static::$scoutBuilder ?? Builder::class, [
             'model' => new static,
             'query' => $query,
             'callback' => $callback,
@@ -31,12 +31,12 @@ trait Searchable {
         ]);
     }
 
-    public function getScoutModelsByIds(\Guestpectacular\Melastic\Builder $builder, array $ids)
+    public function getScoutModelsByIds(Builder $builder, array $ids)
     {
         return $this->queryScoutModelsByIds($builder, $ids)->get();
     }
 
-    public function queryScoutModelsByIds(\Guestpectacular\Melastic\Builder $builder, array $ids)
+    public function queryScoutModelsByIds(Builder $builder, array $ids)
     {
         $query = static::usesSoftDelete()
             ? $this->withTrashed() : $this->newQuery();

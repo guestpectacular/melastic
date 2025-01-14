@@ -8,14 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
-use Laravel\Scout\Builder;
+//use Laravel\Scout\Builder;
+use Guestpectacular\Melastic\Builder;
 use Laravel\Scout\Jobs\RemoveableScoutCollection;
 use Meilisearch\Client as MeilisearchClient;
 use Meilisearch\Contracts\IndexesQuery;
 use Meilisearch\Exceptions\ApiException;
 use Meilisearch\Search\SearchResult;
 
-class MeilisearchEngine extends ScoutMeilisearchEngine
+// TODO: Check all methods that we could update/extract from `ScoutMeilisearchEngine`
+class MeilisearchEngine extends Engine
+//class MeilisearchEngine extends ScoutMeilisearchEngine
 {
     /**
      * The Meilisearch client.
@@ -111,8 +114,9 @@ class MeilisearchEngine extends ScoutMeilisearchEngine
 
         return $this->performSearch($builder, array_filter([
             'filter' => $this->filters($builder),
-            'hitsPerPage' => $builder->limit,
+            'hitsPerPage' => $builder->limit, // Limit was never implemented on Laravel Scout
             'sort' => $this->buildSortFromOrderByClauses($builder),
+            'attributesToSearchOn' => $builder->attributesToSearchOn,
         ]));
 
     }
@@ -133,6 +137,7 @@ class MeilisearchEngine extends ScoutMeilisearchEngine
             'hitsPerPage' => (int) $perPage,
             'page' => $page,
             'sort' => $this->buildSortFromOrderByClauses($builder),
+            'attributesToSearchOn' => $builder->attributesToSearchOn,
         ]));
     }
 
@@ -143,6 +148,7 @@ class MeilisearchEngine extends ScoutMeilisearchEngine
      */
     protected function performSearch(Builder $builder, array $searchParams = [])
     {
+
         $meilisearch = $this->meilisearch->index($builder->index ?: $builder->model->searchableAs());
 
         $searchParams = array_merge($builder->options, $searchParams);
