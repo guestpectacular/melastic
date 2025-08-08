@@ -786,8 +786,7 @@ class Builder extends ScoutBuilder
         if ($engine instanceof PaginatesEloquentModels) {
             return $engine->simplePaginate($this, $perPage, $page)->appends('query', $this->query);
         } elseif ($engine instanceof PaginatesEloquentModelsUsingDatabase) {
-            return $engine->simplePaginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query',
-                $this->query);
+            return $engine->simplePaginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query', $this->query);
         }
 
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
@@ -795,7 +794,9 @@ class Builder extends ScoutBuilder
         $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = $this->model->newCollection($engine->map(
-            $this, $rawResults = $engine->paginate($this, $perPage, $page), $this->model
+            $this,
+            $this->applyAfterRawSearchCallback($rawResults = $engine->paginate($this, $perPage, $page)),
+            $this->model
         )->all());
 
         $paginator = Container::getInstance()->makeWith(Paginator::class, [
@@ -826,15 +827,14 @@ class Builder extends ScoutBuilder
         if ($engine instanceof PaginatesEloquentModels) {
             return $engine->simplePaginate($this, $perPage, $page)->appends('query', $this->query);
         } elseif ($engine instanceof PaginatesEloquentModelsUsingDatabase) {
-            return $engine->simplePaginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query',
-                $this->query);
+            return $engine->simplePaginateUsingDatabase($this, $perPage, $pageName, $page)->appends('query', $this->query);
         }
 
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = $engine->paginate($this, $perPage, $page);
+        $results = $this->applyAfterRawSearchCallback($engine->paginate($this, $perPage, $page));
 
         $paginator = Container::getInstance()->makeWith(Paginator::class, [
             'items' => $results,
@@ -872,7 +872,9 @@ class Builder extends ScoutBuilder
         $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = $this->model->newCollection($engine->map(
-            $this, $rawResults = $engine->paginate($this, $perPage, $page), $this->model
+            $this,
+            $this->applyAfterRawSearchCallback($rawResults = $engine->paginate($this, $perPage, $page)),
+            $this->model
         )->all());
 
         return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
@@ -909,7 +911,7 @@ class Builder extends ScoutBuilder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = $engine->paginate($this, $perPage, $page);
+        $results = $this->applyAfterRawSearchCallback($engine->paginate($this, $perPage, $page));
 
         return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
             'items' => $results,
@@ -952,6 +954,21 @@ class Builder extends ScoutBuilder
         return $this->model->queryScoutModelsByIds(
             $this, $ids
         )->toBase()->getCountForPagination();
+    }
+
+    /**
+     * Invoke the "after raw search" callback.
+     *
+     * @param  mixed  $results
+     * @return mixed
+     */
+    public function applyAfterRawSearchCallback($results)
+    {
+        if ($this->afterRawSearchCallback) {
+            $results = call_user_func($this->afterRawSearchCallback, $results) ?: $results;
+        }
+
+        return $results;
     }
 
     protected function engine(): MeilisearchEngine
