@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\LazyCollection;
 use InvalidArgumentException;
+
 //use Laravel\Scout\Builder;
 use Guestpectacular\Melastic\Builder;
 use Laravel\Scout\Jobs\RemoveableScoutCollection;
@@ -78,7 +79,7 @@ class MeilisearchEngine extends Engine
             );
         })->filter()->values()->all();
 
-        if (! empty($objects)) {
+        if (!empty($objects)) {
             $index->addDocuments($objects, $models->first()->getScoutKeyName());
         }
     }
@@ -182,13 +183,13 @@ class MeilisearchEngine extends Engine
      * @param  mixed  $value
      * @return string
      */
-    protected function formatFilterValues($value)
+    protected function formatFilterValues($value, $withoutQuotes = false)
     {
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
 
-        return (filter_var($value, FILTER_VALIDATE_INT))
+        return ($withoutQuotes || is_numeric($value))
             ? sprintf('%s', $value)
             : sprintf('"%s"', $value);
     }
@@ -238,7 +239,7 @@ class MeilisearchEngine extends Engine
                 return sprintf('%s %s [%s]',
                     $column,
                     $operator === 'In' ? 'IN' : 'NOT IN',
-                    implode(', ', collect($value)->map(fn ($v) => $this->formatFilterValues($v))->toArray())
+                    implode(', ', collect($value)->map(fn($v) => $this->formatFilterValues($v, true))->toArray())
                 );
             }
         }
@@ -258,7 +259,7 @@ class MeilisearchEngine extends Engine
     public function filters(Builder $builder)
     {
 
-        if (! is_array($builder->wheres) || empty($builder->wheres)) {
+        if (!is_array($builder->wheres) || empty($builder->wheres)) {
             return '';
         }
 
@@ -266,7 +267,7 @@ class MeilisearchEngine extends Engine
 
         foreach ($builder->wheres as $expression) {
 
-            if (! empty($stack)) {
+            if (!empty($stack)) {
                 $stack[] = strtoupper($expression['boolean']);
             }
 
