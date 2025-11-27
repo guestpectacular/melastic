@@ -183,13 +183,13 @@ class MeilisearchEngine extends Engine
      * @param  mixed  $value
      * @return string
      */
-    protected function formatFilterValues($value, $withoutQuotes = false)
+    protected function formatFilterValues($value)
     {
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
 
-        return ($withoutQuotes || is_numeric($value))
+        return (is_numeric($value))
             ? sprintf('%s', $value)
             : sprintf('"%s"', $value);
     }
@@ -239,7 +239,7 @@ class MeilisearchEngine extends Engine
                 return sprintf('%s %s [%s]',
                     $column,
                     $operator === 'In' ? 'IN' : 'NOT IN',
-                    implode(', ', collect($value)->map(fn($v) => $this->formatFilterValues($v, true))->toArray())
+                    implode(', ', collect($value)->map(fn($v) => $this->formatFilterValues($v))->toArray())
                 );
             }
         }
