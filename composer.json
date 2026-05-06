@@ -18,15 +18,15 @@
         "php": "^8.3",
         "http-interop/http-factory-guzzle": "^1.2",
         "meilisearch/meilisearch-php": "^1.14",
-        "laravel/scout": "^10.15"
+        "laravel/scout": "^10.15 || ^11.0"
     },
     "require-dev": {
         "laravel/pint": "^1.22",
-        "nunomaduro/collision": "^7.11",
-        "orchestra/testbench": "^8.36",
-        "pestphp/pest": "^2.36",
-        "pestphp/pest-plugin-arch": "^2.7",
-        "pestphp/pest-plugin-laravel": "^2.4"
+        "nunomaduro/collision": "^8.8",
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-arch": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0"
     },
     "autoload": {
         "psr-4": {
